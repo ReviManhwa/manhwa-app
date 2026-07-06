@@ -8,7 +8,7 @@ export function MangaCard({ item }: { item: Manhwa }) {
       className="block rounded-3xl bg-zinc-900 p-3 shadow-md shadow-black/40 transition hover:bg-zinc-800"
     >
       <div className="mb-3 flex aspect-[3/4] items-center justify-center rounded-2xl bg-gradient-to-br from-violet-700 to-zinc-800 text-5xl">
-        {item.emoji}
+        {item.type === "Манхва" ? "📚" : "📖"}
       </div>
 
       <div className="mb-1 flex items-center justify-between">
