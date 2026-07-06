@@ -21,7 +21,7 @@ export function MangaCard({ item }: { item: Manhwa }) {
       <p className="text-sm text-zinc-400">{item.genres.join(" • ")}</p>
 
       <p className="mt-2 text-sm text-yellow-300">
-        ⭐ {item.rating} • {item.chapters} глав
+        ⭐ {item.rating} • {item.chapters.length} глав
       </p>
     </Link>
   );
