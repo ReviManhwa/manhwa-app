@@ -8,7 +8,7 @@ type Props = {
 export function MangaCard({ item }: Props) {
   return (
     <Link
-      href={'/title/${item.id}'}
+      href={"/title/&{item.id}"}
       className="block rounded-3xl bg-zinc-900 p-3 shadow-md shadow-black/40 transition hover:bg-zinc-800"
     >
       <div className="mb-3 overflow-hidden rounded-2xl aspect-[3/4]">
