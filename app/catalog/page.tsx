@@ -1,14 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { manhwas } from "@/data/manhwas";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { MangaCard } from "@/components/MangaCard";
 
 const filters = ["Все", "Манхва", "Манга", "16+", "18+", "Онгоинг", "Завершена"];
 
+type Manhwa = {
+  id: string;
+  title: string;
+  cover: string | null;
+  type: string | null;
+  age_rating: string | null;
+  status: string | null;
+  genres: string | null;
+  rating: number | null;
+  chapters: number | null;
+};
+
 export default function CatalogPage() {
+  const [manhwas, setManhwas] = useState<Manhwa[]>([]);
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("Все");
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase.from("manhwas").select("*");
+      setManhwas(data || []);
+    }
+
+    load();
+  }, []);
 
   const filteredManhwas = manhwas.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase());
@@ -16,21 +38,21 @@ export default function CatalogPage() {
     const matchesFilter =
       activeFilter === "Все" ||
       item.type === activeFilter ||
-      item.age === activeFilter ||
+      item.age_rating === activeFilter ||
       item.status === activeFilter;
 
     return matchesSearch && matchesFilter;
   });
 
   return (
-    <main className="min-h-screen bg-[#09090b] text-white p-6 pb-28">
-      <h1 className="text-4xl font-black mb-6">📚 Каталог</h1>
+    <main className="min-h-screen bg-[#09090b] p-6 pb-28 text-white">
+      <h1 className="mb-6 text-4xl font-black">📚 Каталог</h1>
 
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="🔍 Найти мангу или манхву..."
-        className="mb-5 w-full rounded-2xl bg-zinc-900 px-4 py-3 text-white placeholder:text-zinc-500 outline-none focus:ring-2 focus:ring-violet-500"
+        className="mb-5 w-full rounded-2xl bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500"
       />
 
       <div className="mb-6 flex gap-2 overflow-x-auto">

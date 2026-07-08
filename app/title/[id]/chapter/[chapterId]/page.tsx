@@ -1,4 +1,4 @@
-import { manhwas } from "@/data/manhwas";
+import { supabase } from "@/lib/supabase";
 import { Reader } from "@/components/Reader";
 
 type PageProps = {
@@ -11,15 +11,27 @@ type PageProps = {
 export default async function ChapterPage({ params }: PageProps) {
   const { id, chapterId } = await params;
 
-  const title = manhwas.find((item) => item.id === id);
-  const chapterIndex =
-    title?.chapters.findIndex((item) => item.id === chapterId) ?? -1;
+  const { data: title } = await supabase
+    .from("manhwas")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
 
-  const chapter = title?.chapters[chapterIndex];
-  const prevChapter = title?.chapters[chapterIndex - 1];
-  const nextChapter = title?.chapters[chapterIndex + 1];
+  const { data: chapters } = await supabase
+    .from("chapters")
+    .select("*")
+    .eq("manhwa_id", id)
+    .order("created_at", { ascending: true });
 
-  if (!title || !chapter) {
+  const { data: chapterPages } = await supabase
+    .from("chapter_pages")
+    .select("*")
+    .eq("chapter_id", chapterId)
+    .order("page", { ascending: true });
+    console.log("chapterId =", chapterId);
+    console.log("chapterPages =", chapterPages);
+
+  if (!title || !chapters) {
     return (
       <main className="min-h-screen bg-black p-6 text-white">
         Глава не найдена
@@ -27,12 +39,29 @@ export default async function ChapterPage({ params }: PageProps) {
     );
   }
 
+  const chapterIndex = chapters.findIndex((item) => item.id === chapterId);
+  const chapter = chapters[chapterIndex];
+  const prevChapter = chapters[chapterIndex - 1];
+  const nextChapter = chapters[chapterIndex + 1];
+
+  if (!chapter) {
+    return (
+      <main className="min-h-screen bg-black p-6 text-white">
+        Глава не найдена
+      </main>
+    );
+  }
+
+  const pages = (chapterPages || [])
+    .map((item) => item.image)
+    .filter(Boolean);
+
   return (
     <Reader
       titleId={title.id}
       titleName={title.title}
       chapterTitle={chapter.title}
-      pages={chapter.pages}
+      pages={pages}
       prevChapter={prevChapter}
       nextChapter={nextChapter}
     />
